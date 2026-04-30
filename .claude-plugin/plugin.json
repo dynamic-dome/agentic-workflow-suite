@@ -1,0 +1,5 @@
+{
+  "name": "agentic-workflow-suite",
+  "version": "1.0.0",
+  "description": "Suite of 7 skills, 7 slash commands, and 5 read-only checker hooks that turns rough ideas into agentic workflow blueprints, runs adversarial review-fix-verify loops, audits ecosystems as dynamic graphs, curates raw inbox material into wiki pages, runs MCP/DCO actions safely, and gates skill promotion. Built from the wiki/patterns/agentic-workflow-blueprints reference."
+}

@@ -1,0 +1,55 @@
+{
+  "_comment": "Hook configuration for agentic-workflow-suite. Copy these entries into your ~/.claude/settings.json or project .claude/settings.json. All hooks run in warn-only mode (V2 read-only checkers).",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit|mcp__wiki__wiki_write|mcp__wiki__wiki_append_section",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/raw-write-guard.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__notebooklm__nlm_add_source_url|mcp__notebooklm__nlm_add_source_text|WebFetch|mcp__wiki__wiki_write|mcp__wiki__wiki_append_section",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/private-export-gate.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__wiki__wiki_write|mcp__wiki__wiki_append_section|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/wiki-curation-check.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/mcp-output-envelope.py"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/workflow-wrap-up.py"
+          }
+        ]
+      }
+    ]
+  }
+}

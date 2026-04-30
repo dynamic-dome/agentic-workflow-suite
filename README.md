@@ -1,56 +1,126 @@
-# agentic-workflow-designer
+# agentic-workflow-suite
 
-Claude-Code-Skill, der unstrukturierten Input (Bilder, Notizen, Voice-Transkripte, Skizzen) in **Workflow-Blueprints** mit klaren Triggern, Schritten, Verifikation, Fehlerpfaden und einer Bauteil-Empfehlung (Skill / Command / Hook / MCP) ueberfuehrt.
+A Claude Code plugin that turns rough ideas, raw inbox material, and ad-hoc workflows into a coherent operating system for agentic work — with **7 skills**, **7 slash commands**, and **5 read-only checker hooks**.
 
-## Was dieser Skill ist und nicht ist
+Built from `wiki/patterns/agentic-workflow-blueprints.md`. Tested through 3 real designer runs (TODO file, concept page, multi-phase roadmap) before being expanded into a full plugin.
 
-- **Ist:** Designer. Output ist Markdown im Chat.
-- **Ist nicht:** Executor. Schreibt keinen Code, keine Wiki-Seiten und keine Skills.
+## Was die Suite tut
 
-## Trigger
+| Layer | Bausteine |
+|---|---|
+| **Skills** (7) | `agentic-workflow-designer`, `workflow-router`, `raw-inbox-curator`, `dynamic-graph-auditor`, `review-fix-verify-loop`, `dco-tool-safe-runner`, `skill-promotion-checker` |
+| **Slash Commands** (7) | `/workflow design`, `/workflow route`, `/workflow audit`, `/wiki curate`, `/review-loop`, `/skill promote`, `/mcp safe-run` |
+| **Hooks** (5, read-only) | `raw-write-guard`, `wiki-curation-check`, `mcp-output-envelope`, `private-export-gate`, `workflow-wrap-up` |
 
-Wird ausgeloest durch Phrasen wie:
+## Wann dieses Plugin nutzen
 
-- "design a workflow"
-- "turn this into a skill"
-- "make a blueprint"
-- "spezifiziere"
-- "mach daraus ein workflow"
-- "/workflow design"
+- Du hast eine grobe Idee, einen Screenshot, eine Voice-Notiz oder eine Pattern-Seite und willst daraus einen wiederholbaren Workflow.
+- Du arbeitest an einem grossen Repo-/Plugin-/Wiki-Oekosystem und brauchst Audits, Review-Loops und Privacy-Gates.
+- Du willst Raw-Inbox-Material kontrolliert ins Wiki ueberfuehren.
+- Du willst Promotion-Entscheidungen ("soll das ein Skill werden?") nach harten Checks treffen, nicht nach Bauchgefuehl.
 
-Voll dokumentiert im `description`-Feld der `SKILL.md`-Frontmatter.
+## Skill-Uebersicht
 
-## Struktur
+| Skill | Zweck | Output |
+|---|---|---|
+| `agentic-workflow-designer` | Quelle -> Workflow-Blueprint mit Bauteil-Empfehlung | Markdown-Block mit Schema |
+| `workflow-router` | Anfrage -> Archetyp-Routing (A-G) | YAML mit `archetype`, `risk`, `next_skill` |
+| `raw-inbox-curator` | Raw-Datei -> kuratierte Wiki-Seite | Neue Wiki-Seite + Index/Log-Updates |
+| `dynamic-graph-auditor` | Scope -> Inventar + Cluster + Redundanzen + TODOs | YAML-Audit-Report + optionaler Mermaid |
+| `review-fix-verify-loop` | Patch -> Findings -> Fixes -> Verifikation | YAML mit getrennten Phasen |
+| `dco-tool-safe-runner` | MCP-/Tool-Aktion mit Privacy-Gate + Validierung | YAML mit Audit-Trail |
+| `skill-promotion-checker` | Pattern -> Promotion-Verdict (4 Werte) | YAML mit `verdict`, 6 Checks, Naming-Collision |
 
-```
-SKILL.md                       Entry-Point (~120 Zeilen)
-references/
-├── workflows.md               7 Archetypen (A-G)
-├── promotion-checks.md        6 Checks fuer Skill-Promotion
-├── decisions.md               D1-D4 Design-Entscheidungen
-├── dco-command-spec.md        /workflow design <source> Spec
-├── hooks-readonly.md          raw-write-guard, wiki-curation-check Specs
-└── promotion-log.md           Logbuch fuer reale Laeufe
-examples/
-└── raw-image-to-workflow.md   Goldstandard-Walkthrough
-```
+## Hook-Modi (V2 read-only Checker)
+
+Alle Hooks **warnen, blocken nicht**. Sie schreiben Audit-Logs unter `~/.claude/logs/<hook-name>.ndjson`. Promotion-Pfad zu echten Block-Hooks erst nach 10+ false-positive-freien Laeufen — siehe `skills/agentic-workflow-designer/references/hooks-readonly.md`.
+
+| Hook | Event | Was er prueft |
+|---|---|---|
+| `raw-write-guard` | PreToolUse (Write/Edit/...) | Ziel ist nicht in `wiki/raw/` |
+| `wiki-curation-check` | PostToolUse (Wiki-Write) | Frontmatter, Index-Link, Log-Eintrag |
+| `mcp-output-envelope` | PostToolUse (mcp__*) | MCP-Output als untrusted markieren |
+| `private-export-gate` | PreToolUse (Export-Tools) | Privacy-Klasse der Quelle |
+| `workflow-wrap-up` | Stop | Reminder fuer Wrap-up |
 
 ## Installation
 
-Lokal (nur in diesem Projekt):
+### Variante A — als Plugin via Marketplace
 
 ```bash
-ln -s "$(pwd)" ~/.claude/skills/agentic-workflow-designer
+claude plugin marketplace add willneverusegit/agentic-workflow-suite
+claude plugin install agentic-workflow-suite
 ```
 
-Global ueber das Skillschmiede-/User-Skill-Setup: siehe `~/.claude/skills/integration-guide.md`.
+### Variante B — lokal als Plugin-Repo
 
-## Hintergrund
+```bash
+# In einem beliebigen Projekt-Root:
+git clone https://github.com/willneverusegit/agentic-workflow-suite.git
+# Plugin von einem lokalen Pfad referenzieren:
+claude plugin install agentic-workflow-suite --from ./agentic-workflow-suite
+```
 
-- Pattern-Quelle: `wiki/patterns/agentic-workflow-blueprints.md`
-- TODO: `wiki/todos/2026-04-30-agentic-workflow-blueprints-umsetzen.md`
+### Variante C — einzelner Skill via Symlink
+
+```bash
+ln -s "$(pwd)/skills/agentic-workflow-designer" ~/.claude/skills/agentic-workflow-designer
+```
+
+## Hooks aktivieren
+
+Hooks sind **opt-in**. Konfiguration in `hooks/hooks.json` einsehen, dann gewuenschte Eintraege in deine `~/.claude/settings.json` (oder Projekt-`.claude/settings.json`) uebernehmen — nicht alle muessen aktiviert sein.
+
+## Verzeichnisstruktur
+
+```
+.claude-plugin/
+└── plugin.json                         Plugin-Manifest
+skills/
+├── agentic-workflow-designer/          Hauptdesigner mit references/ + examples/
+├── workflow-router/
+├── raw-inbox-curator/
+├── dynamic-graph-auditor/
+├── review-fix-verify-loop/
+├── dco-tool-safe-runner/
+└── skill-promotion-checker/
+commands/
+├── workflow-design.md                  /workflow design <source>
+├── workflow-route.md                   /workflow route <request>
+├── workflow-audit.md                   /workflow audit <scope>
+├── wiki-curate.md                      /wiki curate <raw-pfad>
+├── review-loop.md                      /review-loop <scope>
+├── skill-promote.md                    /skill promote <pattern>
+└── mcp-safe-run.md                     /mcp safe-run <tool+intent>
+hooks/
+├── hooks.json                          Settings-Snippet
+├── raw-write-guard.py
+├── wiki-curation-check.py
+├── mcp-output-envelope.py
+├── private-export-gate.py
+└── workflow-wrap-up.py
+```
+
+## Empirie hinter dem Plugin
+
+Der Hauptdesigner durchlief vor dem Plugin-Bundle drei dokumentierte Realitaetslaufe:
+
+| Run | Quelle | Verdict | Erkenntnis |
+|---|---|---|---|
+| 1 | TODO-Datei | keep-as-pattern | Naming-Collision-Check fehlte |
+| 2 | Konzept-Seite | keep-as-pattern | Inception-Check fehlte |
+| 3 | Plugin-Roadmap | promote | V2-Sub-Checks griffen automatisch, Bauteil-Ebene `Script` ergaenzt |
+
+Vollstaendiges Logbuch: [`skills/agentic-workflow-designer/references/promotion-log.md`](skills/agentic-workflow-designer/references/promotion-log.md)
+
+## Hintergrund und Quellen
+
+- Pattern-Seite: `wiki/patterns/agentic-workflow-blueprints.md`
+- Zugrundeliegendes Konzept: `wiki/concepts/agentic-workflow-patterns.md`
+- TODO-Origin: `wiki/todos/2026-04-30-agentic-workflow-blueprints-umsetzen.md`
 - Created: 2026-04-30
+- Version: `1.0.0`
 
-## Promotion-Status
+## Lizenz
 
-V1 — Spec und Skill stehen, **2 reale Laeufe ausstehend** bevor Promotion-Verdict eingetragen wird. Logbuch in `references/promotion-log.md`.
+MIT.
