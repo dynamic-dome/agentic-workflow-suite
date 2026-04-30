@@ -53,9 +53,46 @@ Pro Lauf eine Sektion mit folgendem Schema:
 - references/workflows.md Routing-Tabelle: einen achten Eintrag "TODO-Datei mit applies_to:" hinzufuegen, der zu Workflow B routet.
 - SKILL.md Output-Schema: optionalen `## Speicherort`-Block hinzufuegen (Vorschlag wo der Output abgelegt werden koennte).
 
-## Run 2 — _offen_
+## Run 2 — 2026-04-30
 
-Wird beim zweiten echten Lauf des Designers ausgefuellt.
+- Quelle: `wiki/concepts/agentic-workflow-patterns.md`
+- Quellenklasse: wiki
+- Laufdauer: ca. 6 Minuten
+- Output verlinkt: nur in der Chat-Antwort (Inception-Test, deshalb nicht als eigenstaendige Wiki-Query gespeichert)
+
+**Was funktionierte:**
+- Quell-Variation gegen Run 1 erzwungen: TODO-Datei (Run 1) vs. Konzept-Seite (Run 2). Output-Schema hielt beiden stand.
+- Manueller Naming-Collision-Check in Schritt 4 hat 4 von 6 Workflow-Kandidaten als Kollisionen erkannt (`single-loop-implementer`, `tdd`, `swarm-team-lead`, geplanter `raw-inbox-curator`). Ohne den Check waere die Empfehlung Duplikate-lastig gewesen.
+- Inception-Erkennung gelang: Quelle ist selbst ein Workflow-Pattern, also ist die richtige Antwort nicht "neuen Workflow erfinden", sondern "Promotion-Checks auf vorhandene Kandidaten anwenden".
+- Antwort auf eine der offenen Fragen der Quelle ("welche Workflows persistieren?") konnte konkret geliefert werden: 1 neuer Skill (`dynamic-graph-auditor`), 0 neue Hooks, 0 neue Commands.
+
+**Was hakte:**
+- Kein Standard-Archetyp aus `references/workflows.md` matchte direkt. Die Routing-Tabelle ist auf "Aufgabe trifft ein" optimiert, nicht auf "Wissensbasis mit offenen Fragen". Der Designer musste ad-hoc kombinieren (A + G), was funktionierte, aber den Schritt 2 weniger deterministisch macht.
+- Inception-Bremse war manuell — der Skill-Ablauf erzwingt nicht, dass ein Designer-ueber-Designer-Lauf zu "nur Workflow, kein Skill" greift. Glueck oder Aufmerksamkeit, kein Mechanismus.
+- Zwei Verdicts (`promote` fuer Multi-Agent-Codekette und Wiki-Inbox) bedeuten in Wahrheit "verweise auf bereits Existierendes" — das ist semantisch nicht `promote`, sondern eine vierte Kategorie (`already-covered` oder `link-only`). Die Verdict-Matrix kennt das nicht.
+
+**Was fehlte:**
+- Pro-Kandidat-Verdicts brauchten ein Sub-Schema, das die SKILL.md nicht vorgibt. Ich musste das Format im Lauf erfinden. Wenn Konzept-Seiten haeufiger Mehrfach-Kandidaten haben, lohnt sich ein dediziertes Sub-Schema in `references/promotion-checks.md`.
+- Privacy-Klassen-Verfeinerung (Run-1-Vermutung) brauchte ich diesmal **nicht**. In beiden realen Quellen reichte "projekt". Vermutung aus Run 1 wird damit zurueckgestuft — kein V2-Vorschlag mehr.
+
+**Anpassungs-Vorschlaege:**
+- `references/workflows.md` Routing-Tabelle: 8. Eintrag "Konzept-/Wissensbasis-Seite mit offenen Promotion-Fragen" -> ad-hoc-Kombination A+G.
+- `references/promotion-checks.md` Verdict-Matrix: 4. Verdict `already-covered` (oder `link-only`) ergaenzen, fuer den Fall "Kandidat existiert bereits in einem anderen Plugin/Skill, nur Backlink ziehen".
+- SKILL.md Schritt 4 (Bauteil-Empfehlung): expliziten Inception-Check ergaenzen — "Beschreibt die Quelle bereits Workflow-Pattern? Dann kein neuer Skill, nur Verdicts auf vorhandene Kandidaten."
+- SKILL.md Output-Schema: optionaler `## Pro-Kandidat-Verdicts`-Block fuer Quellen mit Mehrfach-Kandidaten.
+
+## Promotion-Entscheidung
+
+### Entscheidung — 2026-04-30
+
+- Verdict: keep-as-pattern
+- Reason: Skill funktioniert in beiden Laeufen, Output-Schema haelt zwei verschiedenen Quell-Typen stand. Aber: Run 1 und Run 2 haben jeweils Schwaechen offengelegt, die behoben werden sollten, bevor der Skill als "stable V1" gilt. Die Schwaechen sind konkret und small-scope, kein grundsaetzlicher Designfehler.
+- Naechster Schritt:
+  1. SKILL.md V2 mit den vier Anpassungen aus Run-1+Run-2-Logbuch (Naming-Collision-Check, Inception-Check, optionales Speicherort-Feld, optionales Pro-Kandidat-Schema).
+  2. `references/workflows.md` um Routing-Eintraege fuer TODO-Dateien und Konzept-Seiten erweitern.
+  3. `references/promotion-checks.md` um Verdict `already-covered` ergaenzen.
+  4. Nach diesen Aenderungen Run 3 an einem dritten Quell-Typ (z. B. ein User-Inline-Text oder ein Bild) — dann Promotion-Verdict erneut pruefen.
+- Aenderungen am Skill (falls keep-as-pattern): siehe oben Punkte 1-3. Sind im naechsten Pflege-Slice umsetzbar, kein Major-Refactor.
 
 ## Promotion-Entscheidung
 
