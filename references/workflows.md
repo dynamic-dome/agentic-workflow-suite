@@ -167,8 +167,10 @@ Wenn unklar, welcher Archetyp passt:
 |---|---|
 | "Was soll ich damit machen?" | A (Intake-Router) |
 | "Bau das" + klare Aufgabe | B (Single-Loop) |
+| TODO-Datei mit `type: todo` und `applies_to:` auf eine Pattern-/Konzept-Seite | B (Single-Loop) — pro Reihenfolge-Punkt entscheiden: Artefakt oder Spec |
 | "Schau dir alles an" / "Inventur" | C (Dynamic-Graph-Audit) |
 | "Pruef das nochmal" / "Patch reviewen" | D (Review-Fix-Verify) |
 | Datei in `wiki/raw/` | E (Raw-to-Wiki) |
 | MCP-/DCO-/Telegram-/DB-Aktion | F (DCO-Tool-Safe) |
 | "Ist das ein Skill?" | G (Skill-Promotion) |
+| Konzept-/Wissensbasis-Seite mit offenen "soll X ein Skill werden?"-Fragen | A + G ad-hoc — pro Kandidat ein Mini-Promotion-Verdict, kein neuer Workflow erfinden (Inception-Risiko, siehe SKILL.md Schritt 4) |

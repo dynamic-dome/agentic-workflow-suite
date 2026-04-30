@@ -17,8 +17,9 @@ Ein Workflow wird zum Skill **nur** wenn folgende Checks alle gruen sind. Andere
 
 ## Verdict-Matrix
 
-- **promote** — alle 6 Checks gruen.
+- **promote** — alle 6 Checks gruen, kein bestehender Skill deckt es ab.
 - **keep-as-pattern** — Checks 1-4 gruen, aber 5 oder 6 fehlen. Workflow ist gut, aber als Skill noch nicht reif. Im Wiki als Pattern halten.
+- **already-covered** — Checks waeren erfuellbar, aber ein bestehender Skill / Plugin / Standard-Tool deckt das Thema bereits ab. Codification waere Duplikat. Aktion: Backlink ziehen, ggf. den existierenden Skill ergaenzen oder umbenennen, **kein** neuer Skill. Erkannt via Naming-Collision-Check (siehe SKILL.md Schritt 4).
 - **reject** — einer der Checks 1-3 ist rot. Der Workflow ist nicht stabil oder zu nischig. Nicht codifizieren.
 
 ## Anti-Patterns (sofort `keep-as-pattern` oder `reject`)
@@ -38,6 +39,10 @@ Wenn `verdict: promote`:
 Wenn `verdict: keep-as-pattern`:
 
 > "Workflow ist nuetzlich, aber Check #<N> fehlt: <warum>. Vorschlag: noch <bedingung> abwarten, dann erneut pruefen."
+
+Wenn `verdict: already-covered`:
+
+> "Workflow ist promotionsreif, aber `<existing-skill-or-plugin>` deckt das Feld bereits ab (Match: <name | trigger | scope>). Stattdessen: Backlink in `<source-page>` auf `<existing>` ziehen ODER `<existing>` um <feature> erweitern. Kein neuer Skill noetig."
 
 Wenn `verdict: reject`:
 
