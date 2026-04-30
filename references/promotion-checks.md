@@ -22,6 +22,21 @@ Ein Workflow wird zum Skill **nur** wenn folgende Checks alle gruen sind. Andere
 - **already-covered** — Checks waeren erfuellbar, aber ein bestehender Skill / Plugin / Standard-Tool deckt das Thema bereits ab. Codification waere Duplikat. Aktion: Backlink ziehen, ggf. den existierenden Skill ergaenzen oder umbenennen, **kein** neuer Skill. Erkannt via Naming-Collision-Check (siehe SKILL.md Schritt 4).
 - **reject** — einer der Checks 1-3 ist rot. Der Workflow ist nicht stabil oder zu nischig. Nicht codifizieren.
 
+## Quell-Klasse Heuristiken (weich, nicht zwingend)
+
+Empirie aus Run 1-3: bestimmte Quell-Klassen tendieren zu bestimmten Verdicts. Das ist **kein Filter, der Verdicts erzwingt** — die 6 Checks oben bleiben die einzige harte Regel. Diese Heuristik soll nur die Designer-Intuition pruefen ("wenn ich `promote` ausgebe, obwohl die Quelle eine Roadmap ist, ist das ungewoehnlich — habe ich gut begruendet warum?").
+
+| Quell-Klasse | Tendenz | Warum |
+|---|---|---|
+| TODO-Datei (`type: todo`, `applies_to:`) | `keep-as-pattern` oder `reject` | Single-Use-Aktionen ueberwiegen, selten ein wiederholbares Pattern. |
+| Konzept-/Wissensbasis-Seite (`type: concept`) | `keep-as-pattern` plus Pro-Kandidat-Verdicts | Konzept-Seiten beschreiben Verstaendnis, nicht Ausfuehrung. Promotion meistens auf abgeleitete Sub-Kandidaten. |
+| Roadmap-/Phasenplan-Markdown (kein Frontmatter, mehrphasig) | `already-covered` oder `reject` | Roadmaps sind Single-Use-Analysen mit hoher Naming-Collision-Wahrscheinlichkeit. |
+| Raw-Inbox-Datei (`wiki/raw/...`, Bild, Voice-Transkript) | `promote` plausibel, wenn Quelle eine wiederholbare Pipeline beschreibt | Raw-Inbox ist oft Quelle echter Workflow-Ideen. |
+| Inline-Text aus dem Chat | `keep-as-pattern` initial | Erst nach 2-3 Wiederholungen reif. |
+| Repo-Datei (Code, Plan, Skript, README) | gemischt, abhaengig vom Inhalt | Promotion-Checks ohne Heuristik-Vorbias. |
+
+Wenn das tatsaechliche Verdict deutlich von der Tendenz abweicht: Reason muss klar machen, *warum* dieser Fall die Ausnahme ist.
+
 ## Anti-Patterns (sofort `keep-as-pattern` oder `reject`)
 
 - Skill macht alles und alles "ein bisschen". Trigger ist generisch ("automate things").

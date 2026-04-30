@@ -14,7 +14,7 @@ Aus unstrukturiertem Input (Bild, Notiz, Voice-Transkript, Wiki-Seite, vager Ide
 - Schritten in einer eindeutigen Reihenfolge
 - Verifikationspunkten
 - Fehlerpfaden
-- Empfehlung: Skill, Command, Hook oder MCP-Contract
+- Empfehlung: Skill, Command, Hook, MCP-Contract, Script oder nur Workflow
 - Promotion-Verdict (`promote` / `keep-as-pattern` / `already-covered` / `reject`)
 
 Der Skill **erzeugt keine echten Skill-Dateien**. Er erzeugt einen Bauplan, den der User danach explizit in eine Runtime promoten kann (z. B. via `skill-creator` oder Plugin-Workflow).
@@ -39,7 +39,7 @@ Folge diesen 6 Schritten in dieser Reihenfolge. Spring nicht vor.
 1. **Quelle lesen.** Bild beschreiben, Datei zitieren, Wiki-Seite holen, Notiz uebernehmen. **Beobachtung und Interpretation getrennt halten** — erst was steht da, dann was bedeutet das.
 2. **Workflow-Typ routen.** Lies `references/workflows.md` und waehle einen der 7 Archetypen (A-G). Wenn nichts passt, baue einen neuen Workflow ad hoc, aber begruende warum keiner der 7 ausreicht.
 3. **Blueprint schreiben.** Folge dem Output-Schema unten. Jeder Pflicht-Block ist nicht-leer. Mermaid ist optional, kein Ersatz fuer Text.
-4. **Bauteil-Empfehlung.** Eines aus `Skill | Command | Hook | MCP-Contract | nur Workflow`. Begruendung in einem Satz: warum diese Ebene, nicht eine andere. Pflicht-Sub-Checks vor der Empfehlung:
+4. **Bauteil-Empfehlung.** Eines aus `Skill | Command | Hook | MCP-Contract | Script | nur Workflow`. Begruendung in einem Satz: warum diese Ebene, nicht eine andere. Abgrenzung: `Script` ist deterministische Logik ohne Sprachmodell-Aufruf (z. B. PowerShell-/Bash-Validatoren, Smoke-Tests, JSON-Parser); waehle es wenn der Kandidat keinen Modellaufruf braucht und ein Skill deshalb Overhead waere. Pflicht-Sub-Checks vor der Empfehlung:
    - **Inception-Check.** Beschreibt die Quelle bereits ein Workflow-Pattern, das selbst Skill-Kandidaten enthaelt? Wenn ja: kein neuer Skill, sondern `nur Workflow` plus Pro-Kandidat-Verdicts (siehe Output-Schema unten). Begruendung "Inception-Risiko" reicht als Reason.
    - **Naming-Collision-Check.** Vergleiche den vorgeschlagenen `name` gegen die Skill-Kandidaten in `references/workflows.md` (`single-loop-implementer`, `dynamic-graph-auditor`, `review-fix-verify-loop`, `raw-inbox-curator`, `dco-tool-safe-runner`, `workflow-router`, `skill-promotion-checker`) und gegen den User-Skill-Pool unter `~/.claude/skills/`. Bei Match: Verdict `already-covered` setzen, **kein** neuer Skill.
 5. **Promotion-Check.** Lies `references/promotion-checks.md` und gib ein Verdict aus (`promote` / `keep-as-pattern` / `already-covered` / `reject`).
@@ -74,11 +74,12 @@ Jeder Lauf produziert genau diese Struktur als Markdown-Antwort:
 - Fehlerpfade:
 
 ## Bauteil-Empfehlung
-- Ebene: Skill | Command | Hook | MCP-Contract | nur Workflow
+- Ebene: Skill | Command | Hook | MCP-Contract | Script | nur Workflow
 - Begruendung (1 Satz):
 - Inception-Check: bestanden | aktiv (Quelle beschreibt Workflow-Pattern, deshalb nur Workflow)
 - Naming-Collision: keine | <existierender-skill-or-plugin>
 - Wenn Skill: vorgeschlagener `name` und `description`-Trigger.
+- Wenn Script: vorgeschlagener Pfad (`scripts/<name>.ps1` oder `.sh`) und Aufrufkontext (manuell / Pre-Commit / Wrap-up-Hook).
 
 ## Promotion
 - Verdict: promote | keep-as-pattern | already-covered | reject
@@ -98,8 +99,9 @@ Bei bestimmten Quell-Typen ergaenze einen oder beide Optional-Bloecke. Sie sind 
 ## Pro-Kandidat-Verdicts
 <Wenn die Quelle mehrere Skill-/Workflow-Kandidaten enthaelt — z. B.
 eine Konzept-Seite mit 3+ Workflows. Pro Kandidat ein Mini-Block:
-Verdict + Reason + Naming-Collision. Verwende dasselbe 4-Werte-Set
-wie im Promotion-Block.>
+Verdict + Reason + Naming-Collision + Bauteil-Ebene
+(Skill / Command / Hook / MCP-Contract / Script / nur Workflow).
+Verwende dasselbe 4-Werte-Set wie im Promotion-Block.>
 
 ## Speicherort (Vorschlag)
 <Wenn der User den Output ablegen will: empfehle einen Pfad

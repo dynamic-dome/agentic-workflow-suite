@@ -174,3 +174,4 @@ Wenn unklar, welcher Archetyp passt:
 | MCP-/DCO-/Telegram-/DB-Aktion | F (DCO-Tool-Safe) |
 | "Ist das ein Skill?" | G (Skill-Promotion) |
 | Konzept-/Wissensbasis-Seite mit offenen "soll X ein Skill werden?"-Fragen | A + G ad-hoc — pro Kandidat ein Mini-Promotion-Verdict, kein neuer Workflow erfinden (Inception-Risiko, siehe SKILL.md Schritt 4) |
+| Roadmap-/Phasenplan-Datei (Markdown ohne Frontmatter, mehrphasig, Deliverables pro Phase, beschreibt oft das eigene Plugin-/Tool-Oekosystem) | C primaer + B pro Work-Package — Quelle ist meist Audit-Ergebnis, kein Audit-Auftrag. Inception-Check ist hier strukturell wahrscheinlich (Designer ist Teil des beschriebenen Oekosystems); Naming-Collision-Treffer haeufig. Verdict-Verteilung tendiert zu `already-covered`. |
