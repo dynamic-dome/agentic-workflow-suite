@@ -81,31 +81,50 @@ Pro Lauf eine Sektion mit folgendem Schema:
 - SKILL.md Schritt 4 (Bauteil-Empfehlung): expliziten Inception-Check ergaenzen — "Beschreibt die Quelle bereits Workflow-Pattern? Dann kein neuer Skill, nur Verdicts auf vorhandene Kandidaten."
 - SKILL.md Output-Schema: optionaler `## Pro-Kandidat-Verdicts`-Block fuer Quellen mit Mehrfach-Kandidaten.
 
-## Promotion-Entscheidung
+## Run 3 — 2026-04-30
 
-### Entscheidung — 2026-04-30
+- Quelle: `Desktop/Claude-Plugins-Skills/PLUGIN-SKILL-IMPROVEMENT-ROADMAP-2026-04-30.md`
+- Quellenklasse: repo (445 Zeilen Markdown ohne Frontmatter, Roadmap mit Phasen 0-5 + Work-Packages)
+- Laufdauer: ca. 8 Minuten
+- Output verlinkt: nur in der Chat-Antwort (nicht als Wiki-Query gespeichert; Quelle ist Repo, nicht Wiki — Speicherort-Block wuerde hier auf `wiki/queries/` zeigen, aber User entscheidet)
 
-- Verdict: keep-as-pattern
-- Reason: Skill funktioniert in beiden Laeufen, Output-Schema haelt zwei verschiedenen Quell-Typen stand. Aber: Run 1 und Run 2 haben jeweils Schwaechen offengelegt, die behoben werden sollten, bevor der Skill als "stable V1" gilt. Die Schwaechen sind konkret und small-scope, kein grundsaetzlicher Designfehler.
+**Was funktionierte:**
+- Erster Lauf nach V2. **Naming-Collision-Check griff automatisch** (Schritt 4 zwingt es) und fand 4+ Kollisionen in den Phasen 1, 2, 5 und WP3. Ohne V2 waere der Designer blind durchgelaufen.
+- **Inception-Check griff automatisch** und verhinderte eine Selbst-Empfehlung (`agentic-workflow-designer` ist Teil des in der Roadmap beschriebenen Oekosystems).
+- **Optionaler `Pro-Kandidat-Verdicts`-Block** war hier genau richtig: 9 Kandidaten (6 Phasen + 3 Work-Packages), pro Kandidat ein Mini-Verdict. Die V2-Schema-Erweiterung hat sich an einem realen Fall bewiesen.
+- **Verdict-Werte sind ausgewogen:** 4x already-covered, 2x keep-as-pattern, 2x reject, 1x promote-als-Script, 1x reject fuer den Top-Level-Skill selbst. Das ist gesunde Empirie ueber das Oekosystem, kein "alles ist toll"-Bias.
+- **Routing-Tabelle** lieferte sauber Workflow C (Dynamic-Graph-Audit) als Primaer, mit B-Anteilen pro Work-Package.
+
+**Was hakte:**
+- **Bauteil-Ebene `Script` fehlt.** Phase 4 verlangt nach `scripts/plugin_ecosystem_smoke.ps1` — das ist ein Promotion-Kandidat, aber kein Skill, kein Command, kein Hook und kein MCP. Im Lauf habe ich es manuell als "kein Skill, sondern Script" markiert. SKILL.md kennt nur 5 Ebenen (`Skill | Command | Hook | MCP-Contract | nur Workflow`). V3-Vorschlag.
+- **Phasen ohne Frontmatter:** die Quelle hat keine maschinenlesbaren Tags, also musste die Phasen-Aufzaehlung manuell aus dem Markdown extrahiert werden. Bei sehr grossen Quellen (>1000 Zeilen) koennte das zur Schwachstelle werden. Heute irrelevant.
+
+**Was fehlte:**
+- Kein Mechanismus, um zu erkennen, dass die Roadmap **selbst ein Audit-Ergebnis** ist (Workflow C wurde bereits gelaufen). Der Designer kann zwar die Quelle als "Audit-Ergebnis" lesen, hat aber keinen expliziten Schritt dafuer. Bei wiederholten Roadmap-Inputs koennte das verwirren — aber der Inception-Check bremst es bereits indirekt.
+
+**Anpassungs-Vorschlaege (V3):**
+- SKILL.md Bauteil-Ebenen erweitern: 5. Wert `Script` hinzufuegen, fuer Skript-Kandidaten die kein Skill rechtfertigen.
+- `references/workflows.md` Routing-Tabelle: 10. Eintrag "Roadmap-/Phasenplan-Datei (Markdown ohne Frontmatter, mehrphasig, Deliverables pro Phase)" -> C+B ad-hoc.
+- Optional: `references/promotion-checks.md` koennte einen expliziten "Quell-Klasse"-Filter bekommen (Roadmap-Quellen sind per se selten promote-Kandidaten; Trigger-Klarheit ist bei Single-Use-Roadmaps niedrig).
+
+## Promotion-Entscheidung — Final
+
+### Entscheidung — 2026-04-30 (nach Run 3)
+
+- Verdict: **promote**
+- Reason: Drei Laeufe an drei kategorisch unterschiedlichen Quell-Typen (TODO-Datei, Konzept-Seite, Roadmap-Markdown). Alle 3 produzierten vollstaendige Outputs nach Pflicht-Schema. V2-Sub-Checks (Inception, Naming-Collision) griffen in Run 3 automatisch und ersetzten die manuelle Arbeit aus Run 1+2. Verdict-Verteilung ueber Run 3 (4x already-covered, 2x keep-as-pattern, 2x reject, 1x promote) ist ausgewogen und zeigt nicht das "Designer empfiehlt immer promote"-Anti-Pattern. Promotion-Checks-Liste ist erfuellt:
+  - Wiederholung: 3 Laeufe ✅
+  - Trigger-Klarheit: 7+ Trigger-Phrasen + Anti-Trigger ✅
+  - Stabilitaet: Output-Schema unveraendert seit V1, V2 nur erweitert ✅
+  - Kontextkosten: SKILL.md 141 Zeilen ✅
+  - Testbarkeit: 3 reale Beispiele + 1 Goldstandard-Walkthrough ✅
+  - Rollback: read-only auf Quellen, schreibt nichts ✅
 - Naechster Schritt:
-  1. SKILL.md V2 mit den vier Anpassungen aus Run-1+Run-2-Logbuch (Naming-Collision-Check, Inception-Check, optionales Speicherort-Feld, optionales Pro-Kandidat-Schema).
-  2. `references/workflows.md` um Routing-Eintraege fuer TODO-Dateien und Konzept-Seiten erweitern.
-  3. `references/promotion-checks.md` um Verdict `already-covered` ergaenzen.
-  4. Nach diesen Aenderungen Run 3 an einem dritten Quell-Typ (z. B. ein User-Inline-Text oder ein Bild) — dann Promotion-Verdict erneut pruefen.
-- Aenderungen am Skill (falls keep-as-pattern): siehe oben Punkte 1-3. Sind im naechsten Pflege-Slice umsetzbar, kein Major-Refactor.
+  1. **V3 separat** (kein Blocker fuer Promotion): `Script` als 5. Bauteil-Ebene in SKILL.md, Roadmap-Eintrag in der Routing-Tabelle. Klein, in einem Slice umsetzbar.
+  2. **Plugin-/Marketplace-Frage** wieder anpacken — das Repo ist jetzt promote-reif, also eigenstaendige `plugin.json` + Marketplace-Eintrag wird sinnvoll.
+  3. **Run 4+** spontan, wenn ein neuer Quell-Typ vorbeikommt (z. B. Bild, Voice-Transkript, externe URL). Kein zwingender naechster Schritt; der Skill ist im Wildbetrieb-Modus.
 
-## Promotion-Entscheidung
-
-Wird nach mindestens 2 Runs eingetragen. Schema:
-
-```markdown
-### Entscheidung — YYYY-MM-DD
-
-- Verdict: promote | keep-as-pattern | reject | needs-more-data
-- Reason: <warum>
-- Naechster Schritt: <konkret>
-- Aenderungen am Skill (falls keep-as-pattern): <was muss noch ueberarbeitet werden>
-```
+**Promotion-Status des Skills:** stabil V2, promote-reif, keine offenen Designfehler. V3-Punkte sind Pflege, keine Notwendigkeit.
 
 ## Was diesen Skill **nicht** weiter promoted
 
