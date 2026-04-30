@@ -1,0 +1,19 @@
+# Cygwin/MSYS Bash-Crash-Artefakte
+bash.exe.stackdump
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code lokale Settings (privat halten)
+.claude/settings.local.json
+.claude-mem/
+
+# Lokale Agent-Memory-Artefakte (sollten nicht ins Repo)
+.agent-memory/
