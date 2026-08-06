@@ -21,7 +21,7 @@ from pathlib import Path
 
 
 LOG_PATH = Path.home() / ".claude" / "logs" / "wiki-curation-check.ndjson"
-WIKI_ROOT = Path.home() / "wiki"
+WIKI_ROOT = Path.home() / "wiki" / "wiki"
 
 
 def main() -> int:
@@ -49,15 +49,15 @@ def main() -> int:
 
 def check(target_norm: str) -> list[str]:
     findings: list[str] = []
-    target_path = Path(target_norm)
+    target_path = resolve_target(target_norm)
 
-    if not target_path.exists():
-        return findings
+    if target_path is None or not target_path.is_file():
+        return [f"target could not be resolved: {target_norm}"]
 
     try:
         content = target_path.read_text(encoding="utf-8", errors="replace")
-    except Exception:
-        return findings
+    except Exception as exc:
+        return [f"target could not be read: {target_norm} ({type(exc).__name__})"]
 
     head = content[:600]
     if not head.lstrip().startswith("---"):
@@ -65,19 +65,37 @@ def check(target_norm: str) -> list[str]:
     elif "type:" not in head:
         findings.append("frontmatter missing 'type' field")
 
-    index_path = WIKI_ROOT / "wiki" / "index.md"
+    index_path = WIKI_ROOT / "index.md"
     if index_path.exists():
         index_text = index_path.read_text(encoding="utf-8", errors="replace")
         if target_path.name not in index_text:
             findings.append(f"page '{target_path.name}' not linked in wiki/index.md")
 
-    log_path = WIKI_ROOT / "wiki" / "log.md"
+    log_path = WIKI_ROOT / "log.md"
     if log_path.exists():
         log_tail = log_path.read_text(encoding="utf-8", errors="replace")[-3000:]
         if date.today().isoformat() not in log_tail:
             findings.append("today's date not found in wiki/log.md tail (log_append missed?)")
 
     return findings
+
+
+def resolve_target(target_norm: str) -> Path | None:
+    root = WIKI_ROOT.resolve()
+    logical_path = Path(target_norm)
+    if logical_path.is_absolute():
+        candidate = logical_path.resolve()
+    else:
+        parts = logical_path.parts
+        if parts and parts[0].lower() == "wiki":
+            logical_path = Path(*parts[1:])
+        candidate = (root / logical_path).resolve()
+
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return None
+    return candidate
 
 
 def log_entry(target: str, findings: list[str]) -> None:

@@ -59,26 +59,28 @@ def main() -> int:
 
     haystack = " | ".join(candidates).lower().replace("\\", "/")
 
-    if any(marker in haystack for marker in PRIVATE_MARKERS):
-        log_entry(tool_name, haystack, "warn")
+    matched_marker = next((marker for marker in PRIVATE_MARKERS if marker in haystack), None)
+    if matched_marker is not None:
+        log_entry(tool_name, "warn", matched_marker)
         sys.stderr.write(
             f"private-export-gate: tool '{tool_name}' may export a private source. "
             f"Confirm explicit export intent before proceeding.\n"
         )
         return 0
 
-    log_entry(tool_name, haystack, "allow")
+    log_entry(tool_name, "allow")
     return 0
 
 
-def log_entry(tool: str, haystack: str, decision: str) -> None:
+def log_entry(tool: str, decision: str, matched_marker: str | None = None) -> None:
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     record = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "tool": tool,
-        "haystack_preview": haystack[:200],
         "decision": decision,
     }
+    if matched_marker is not None:
+        record["matched_marker"] = matched_marker
     try:
         with LOG_PATH.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(record) + "\n")
